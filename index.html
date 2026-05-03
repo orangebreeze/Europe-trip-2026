@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>匈奧捷之旅 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1a3a5c;
+    --royal: #2e6da4;
+    --light-blue: #e6f1fb;
+    --mid-blue: #b5d4f4;
+    --gold: #fac775;
+    --dark-gold: #854f0b;
+    --bg: #f5f5f0;
+    --card-bg: #ffffff;
+    --text-dark: #1a2a3a;
+    --text-mid: #3a5068;
+    --text-muted: #6a8499;
+    --border: #d0dce8;
+    --success: #27500a;
+    --dinner-color: #7b1f1f;
+    --lunch-color: #3b6d11;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--bg);
+    color: var(--text-dark);
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--navy);
+    color: white;
+    text-align: center;
+    padding: 2rem 1rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 20px,
+      rgba(255,255,255,0.03) 20px,
+      rgba(255,255,255,0.03) 40px
+    );
+  }
+  header h1 {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    position: relative;
+  }
+  header .subtitle {
+    font-size: 1rem;
+    color: var(--mid-blue);
+    margin-top: 0.4rem;
+    position: relative;
+  }
+  header .flags {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    position: relative;
+  }
+
+  /* FLIGHT SUMMARY */
+  .flight-bar {
+    background: var(--royal);
+    color: white;
+    padding: 0.8rem 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    justify-content: center;
+    font-size: 0.88rem;
+    align-items: center;
+  }
+  .flight-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .flight-icon { font-size: 1rem; }
+  .flight-label { opacity: 0.8; }
+  .flight-val { font-weight: 700; color: var(--gold); }
+
+  /* WEATHER STRIP */
+  #weather-strip {
+    background: var(--light-blue);
+    border-bottom: 2px solid var(--mid-blue);
+    padding: 0.7rem 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    justify-content: center;
+    font-size: 0.9rem;
+  }
+  .weather-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--navy);
+    font-weight: 500;
+  }
+  .weather-temp { color: var(--royal); font-weight: 700; }
+  .weather-loading { color: var(--text-muted); font-style: italic; }
+
+  /* TABS */
+  .tabs-container {
+    background: var(--navy);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tabs-container::-webkit-scrollbar { display: none; }
+  .tabs {
+    display: flex;
+    min-width: max-content;
+    padding: 0 0.5rem;
+  }
+  .tab {
+    padding: 0.7rem 1rem;
+    cursor: pointer;
+    color: var(--mid-blue);
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .tab:hover { color: white; }
+  .tab.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+    font-weight: 700;
+  }
+
+  /* DAY CONTENT */
+  .day-content { display: none; }
+  .day-content.active { display: block; }
+
+  /* DAY HEADER */
+  .day-header {
+    background: var(--navy);
+    color: white;
+    padding: 1.2rem 1rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+  .day-date {
+    background: var(--gold);
+    color: var(--navy);
+    border-radius: 8px;
+    padding: 0.3rem 0.8rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+    white-space: nowrap;
+  }
+  .day-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+  .day-subtitle {
+    font-size: 0.85rem;
+    color: var(--mid-blue);
+    width: 100%;
+  }
+
+  /* MAP */
+  .map-container {
+    width: 100%;
+    height: 300px;
+    background: var(--light-blue);
+    position: relative;
+    border-bottom: 2px solid var(--mid-blue);
+  }
+  .map-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  /* ITINERARY */
+  .itinerary { padding: 1rem; }
+
+  .time-block {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+    align-items: flex-start;
+  }
+  .time-label {
+    background: var(--navy);
+    color: var(--gold);
+    border-radius: 6px;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    min-width: 52px;
+    text-align: center;
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+    letter-spacing: 0.03em;
+  }
+  .time-label.dinner { background: var(--dinner-color); color: #fdf0f0; }
+  .time-label.lunch { background: var(--lunch-color); color: #eaf3de; }
+
+  .spot-card {
+    background: var(--card-bg);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    padding: 0.8rem 1rem;
+    flex: 1;
+    box-shadow: 0 1px 4px rgba(26,58,92,0.07);
+  }
+  .spot-name {
+    font-weight: 700;
+    color: var(--navy);
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+  .spot-name-en {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 0.3rem;
+  }
+  .spot-desc {
+    font-size: 0.88rem;
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+  .spot-tip {
+    margin-top: 0.4rem;
+    font-size: 0.82rem;
+    background: #fff8ec;
+    border-left: 3px solid var(--gold);
+    padding: 0.3rem 0.5rem;
+    border-radius: 0 4px 4px 0;
+    color: var(--dark-gold);
+  }
+  .spot-booked {
+    display: inline-block;
+    background: #e8f4e8;
+    color: var(--success);
+    border-radius: 4px;
+    padding: 0.1rem 0.4rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-left: 0.4rem;
+    vertical-align: middle;
+  }
+  .spot-address {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 0.3rem;
+  }
+
+  .section-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--royal);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 1.2rem 0 0.5rem;
+    padding: 0 0 0.2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* HOTEL CARD */
+  .hotel-card {
+    background: var(--navy);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    margin: 1.2rem 0 0.5rem;
+    display: flex;
+    gap: 0.9rem;
+    align-items: flex-start;
+    box-shadow: 0 2px 8px rgba(26,58,92,0.18);
+  }
+  .hotel-icon {
+    font-size: 1.6rem;
+    flex-shrink: 0;
+  }
+  .hotel-info {}
+  .hotel-label {
+    font-size: 0.75rem;
+    color: var(--mid-blue);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.15rem;
+  }
+  .hotel-name {
+    font-weight: 700;
+    color: white;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+  .hotel-addr {
+    font-size: 0.8rem;
+    color: var(--mid-blue);
+    margin-top: 0.15rem;
+  }
+  .hotel-nights {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--navy);
+    border-radius: 4px;
+    padding: 0.1rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-top: 0.3rem;
+  }
+  /* Map button style */
+  .map-btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.8rem 1rem 0.4rem;
+    background: var(--light-blue);
+  }
+  .map-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--navy);
+    color: white;
+    border-radius: 8px;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    font-family: inherit;
+  }
+  .map-btn:hover { background: var(--royal); }
+  .map-btn.secondary { background: white; color: var(--navy); border: 1.5px solid var(--mid-blue); }
+  .map-note {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    padding: 0.2rem 1rem 0.8rem;
+    background: var(--light-blue);
+    border-bottom: 2px solid var(--mid-blue);
+  }
+
+  /* TIPS */
+  .tips-card {
+    background: #fff8ec;
+    border: 1.5px solid var(--gold);
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    margin: 1rem 0;
+  }
+  .tips-title {
+    font-weight: 700;
+    color: var(--dark-gold);
+    font-size: 0.9rem;
+    margin-bottom: 0.4rem;
+  }
+  .tips-list {
+    list-style: none;
+    padding: 0;
+  }
+  .tips-list li {
+    font-size: 0.85rem;
+    color: var(--text-mid);
+    padding: 0.2rem 0;
+    padding-left: 1.2rem;
+    position: relative;
+  }
+  .tips-list li::before {
+    content: '•';
+    position: absolute;
+    left: 0.3rem;
+    color: var(--gold);
+    font-weight: 700;
+  }
+
+  /* GENERAL TIPS PAGE */
+  .tips-section {
+    padding: 1rem;
+  }
+  .tip-block {
+    background: var(--card-bg);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    padding: 1rem;
+    margin-bottom: 0.8rem;
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-start;
+  }
+  .tip-emoji { font-size: 1.6rem; flex-shrink: 0; }
+  .tip-content {}
+  .tip-title { font-weight: 700; color: var(--navy); font-size: 0.95rem; }
+  .tip-body { font-size: 0.85rem; color: var(--text-mid); line-height: 1.6; }
+
+  /* FLIGHT PAGE */
+  .flight-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin: 1rem 0;
+  }
+  .flight-table th {
+    background: var(--navy);
+    color: white;
+    padding: 0.6rem 0.7rem;
+    text-align: left;
+    font-size: 0.82rem;
+  }
+  .flight-table td {
+    padding: 0.6rem 0.7rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+    color: var(--text-dark);
+  }
+  .flight-table tr:nth-child(even) td { background: var(--light-blue); }
+  .fn { font-weight: 700; color: var(--royal); }
+
+  footer {
+    background: var(--navy);
+    color: var(--mid-blue);
+    text-align: center;
+    padding: 1.2rem;
+    font-size: 0.8rem;
+    margin-top: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    header h1 { font-size: 1.5rem; }
+    .day-title { font-size: 1rem; }
+    body { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="flags">🇭🇺 🇦🇹 🇨🇿</div>
+  <h1>匈奧捷之旅 2026</h1>
+  <div class="subtitle">5月7日 — 5月18日 &nbsp;|&nbsp; 五人同行 🇺🇸 美國3人 + 🇭🇰 香港2人</div>
+  <a href="https://www.icloud.com/sharedalbum/#B1e5Uzl7VtFgT3f" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;margin-top:0.8rem;background:white;color:#1a3a5c;border-radius:20px;padding:0.45rem 1.2rem;font-size:0.9rem;font-weight:700;text-decoration:none;position:relative;">📸 匈奧捷旅遊相簿</a>
+</header>
+
+<div class="flight-bar">
+  <div class="flight-item"><span class="flight-icon">✈️</span><span class="flight-label">出發：</span><span class="flight-val">ATL → BUD</span><span> 5/7 出發</span></div>
+  <div class="flight-item"><span class="flight-icon">✈️</span><span class="flight-label">回程：</span><span class="flight-val">PRG → ATL</span><span> 5/18 抵達</span></div>
+  <div class="flight-item"><span class="flight-icon">📋</span><span class="flight-label">訂單號：</span><span class="flight-val">GPGF28</span></div>
+</div>
+
+<div id="weather-strip">
+  <div class="weather-loading">正在載入天氣資料...</div>
+</div>
+
+<div class="tabs-container">
+  <div class="tabs" id="tabs">
+    <div class="tab active" onclick="showDay('overview')">✈️ 機票</div>
+    <div class="tab" onclick="showDay('d5_8')">5/8 布達</div>
+    <div class="tab" onclick="showDay('d5_9')">5/9 布達</div>
+    <div class="tab" onclick="showDay('d5_10')">5/10 維也納</div>
+    <div class="tab" onclick="showDay('d5_11')">5/11 維也納</div>
+    <div class="tab" onclick="showDay('d5_12')">5/12 薩爾茨堡</div>
+    <div class="tab" onclick="showDay('d5_13')">5/13 哈修塔特</div>
+    <div class="tab" onclick="showDay('d5_14')">5/14 CK小鎮</div>
+    <div class="tab" onclick="showDay('d5_15')">5/15 布拉格</div>
+    <div class="tab" onclick="showDay('d5_16')">5/16 布拉格</div>
+    <div class="tab" onclick="showDay('d5_17')">5/17 布拉格</div>
+    <div class="tab" onclick="showDay('tips')">💡 貼士</div>
+  </div>
+</div>
+
+<!-- OVERVIEW / FLIGHTS -->
+<div class="day-content active" id="overview">
+  <div class="day-header">
+    <div class="day-date">機票資料</div>
+    <div class="day-title">✈️ 飛行行程總覽</div>
+  </div>
+  <div class="itinerary">
+    <div class="section-label">🇺🇸 美國組去程（源、茜、珠）</div>
+    <table class="flight-table">
+      <tr><th>日期</th><th>航段</th><th>航班</th><th>出發</th><th>抵達</th></tr>
+      <tr><td>5/7 四</td><td>ATL → CDG（巴黎）</td><td class="fn">DL8731</td><td>4:30pm</td><td>5/8 6:50am</td></tr>
+      <tr><td>5/8 五</td><td>CDG → BUD（布達佩斯）</td><td class="fn">DL8638</td><td>9:30am</td><td>11:50am</td></tr>
+    </table>
+    <div class="tips-card">
+      <div class="tips-title">⏱️ CDG 轉機注意</div>
+      <ul class="tips-list">
+        <li>6:50am 抵達 CDG，轉機等候約 2小時40分</li>
+        <li>乘搭免費接駁車往 Terminal F</li>
+        <li>建議預留充足時間，不要心急</li>
+      </ul>
+    </div>
+    <div class="section-label">🇭🇰 香港組去程（文、Ice）</div>
+    <table class="flight-table">
+      <tr><th>日期</th><th>航段</th><th>航班</th><th>出發</th><th>抵達</th></tr>
+      <tr><td>5/7 四</td><td>HKG → FRA（法蘭克福）</td><td class="fn">LH7015</td><td>23:55</td><td>5/8 07:15</td></tr>
+      <tr><td>5/8 五</td><td>FRA → BUD（布達佩斯）</td><td class="fn">LH1336</td><td>09:40</td><td>11:15</td></tr>
+    </table>
+    <div class="tips-card">
+      <div class="tips-title">⏱️ 法蘭克福 FRA 轉機注意</div>
+      <ul class="tips-list">
+        <li>07:15 抵達 FRA Terminal 3（國泰）</li>
+        <li>⚠️ 需要由 Terminal 3 換去 Terminal 1 搭 LH1336</li>
+        <li>轉機時間 2小時25分，建議快步前往，唔好耽誤</li>
+        <li>09:40 由 FRA Terminal 1 出發往布達佩斯</li>
+      </ul>
+    </div>
+    <div class="tips-card">
+      <div class="tips-title">✅ 5/8 BUD 機場大會合！</div>
+      <ul class="tips-list">
+        <li>🇺🇸 美國組（源、茜、珠）：11:50am 抵達 BUD Terminal 2A</li>
+        <li>🇭🇰 香港組（文、Ice）：11:15am 抵達 BUD Terminal 2A</li>
+        <li>香港組反而早少少到！喺入境大堂出口等齊五個人 🎉</li>
+        <li>一齊坐車去 Chloe Hotel Budapest 放行李</li>
+      </ul>
+    </div>
+    <div class="section-label">✈️ 回程（5/18）</div>
+    <div class="section-label" style="font-size:0.72rem; color:var(--text-muted); border:none; margin-top:-0.5rem;">🇺🇸 美國組</div>
+    <table class="flight-table">
+      <tr><th>日期</th><th>航段</th><th>航班</th><th>出發</th><th>抵達</th></tr>
+      <tr><td>5/18 一</td><td>PRG → AMS（阿姆斯特丹）</td><td class="fn">DL9693</td><td>2:30pm</td><td>4:00pm</td></tr>
+      <tr><td>5/18 一</td><td>AMS → ATL</td><td class="fn">DL9374</td><td>5:05pm</td><td>8:25pm</td></tr>
+    </table>
+    <div class="section-label" style="font-size:0.72rem; color:var(--text-muted); border:none; margin-top:0.3rem;">🇭🇰 香港組</div>
+    <table class="flight-table">
+      <tr><th>日期</th><th>航段</th><th>航班</th><th>出發</th><th>抵達</th></tr>
+      <tr><td>5/18 一</td><td>PRG → FRA（法蘭克福）</td><td class="fn">LH1397</td><td>14:20</td><td>15:30</td></tr>
+      <tr><td>5/18 一</td><td>FRA → HKG（香港）</td><td class="fn">LH796</td><td>21:40</td><td>5/19 15:20</td></tr>
+    </table>
+    <div class="tips-card">
+      <div class="tips-title">🏠 5/18 回程注意</div>
+      <ul class="tips-list">
+        <li>🇺🇸 美國組：下午2:30 PRG 出發，經阿姆斯特丹，晚上8:25 抵達 ATL</li>
+        <li>🇭🇰 香港組：下午2:20 PRG 出發，經法蘭克福，5/19 下午3:20 抵達 HKG</li>
+        <li>⚠️ 香港組 FRA 轉機等候 6小時10分，時間充裕</li>
+        <li>早上各自退房，前往 PRG 機場，揮手再見！👋</li>
+      </ul>
+    </div>
+    <div class="section-label">💺 座位資料（美國組）</div>
+    <table class="flight-table">
+      <tr><th>航班</th><th>座位</th></tr>
+      <tr><td>DL8731 (ATL→CDG)</td><td>AC ABC（Int）</td></tr>
+      <tr><td>DL8638 (CDG→BUD)</td><td>15ACD</td></tr>
+      <tr><td>DL9693 (PRG→AMS)</td><td>17 ABC</td></tr>
+      <tr><td>DL9374 (AMS→ATL)</td><td>38HJK</td></tr>
+    </table>
+    <div class="section-label">酒店總覽</div>
+    <div class="hotel-card">
+      <div class="hotel-icon">🏨</div>
+      <div><div class="hotel-name">布達佩斯 (5/8–5/10，2晚)</div><div class="hotel-addr">Chloe Hotel Budapest, 1056 Budapest, Só utca 4</div></div>
+    </div>
+    <div class="hotel-card">
+      <div class="hotel-icon">🏨</div>
+      <div><div class="hotel-name">維也納 (5/10–5/12，2晚)</div><div class="hotel-addr">Austria Trend Hotel Europa Wien, Kärntnerstraße 18</div></div>
+    </div>
+    <div class="hotel-card">
+      <div class="hotel-icon">🏨</div>
+      <div><div class="hotel-name">薩爾茨堡 (5/12–5/13，1晚)</div><div class="hotel-addr">Austria Trend Hotel Europa Salzburg, Rainerstraße 31</div></div>
+    </div>
+    <div class="hotel-card">
+      <div class="hotel-icon">🏨</div>
+      <div><div class="hotel-name">林茨 (5/13–5/14，1晚)</div><div class="hotel-addr">Courtyard by Marriott Linz, Europaplatz 2</div></div>
+    </div>
+    <div class="hotel-card">
+      <div class="hotel-icon">🏨</div>
+      <div><div class="hotel-name">CK小鎮 (5/14–5/15，1晚)</div><div class="hotel-addr">格蘭酒店，Náměstí Svornosti 3, 38101</div></div>
+    </div>
+    <div class="hotel-card">
+      <div class="hotel-icon">🏨</div>
+      <div><div class="hotel-name">布拉格 (5/15–5/18，3晚)</div><div class="hotel-addr">Hotel Rott Prague</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 5/8 BUDAPEST -->
+<div class="day-content" id="d5_8">
+  <div class="day-header">
+    <div class="day-date">5月8日 五</div>
+    <div class="day-title">🇭🇺 布達佩斯 Budapest — 抵達日</div>
+    <div class="day-subtitle">從機場入城，晚上夜遊多瑙河</div>
+  </div>
+  <div class="map-btn-row">
+    <a class="map-btn" href="https://www.google.com/maps/dir/Budapest+Airport/Chloe+Hotel+Budapest/New+York+Cafe+Budapest/Danube+Cruise+Budapest" target="_blank">🗺️ Google Maps 今日路線</a>
+    <a class="map-btn secondary" href="https://maps.apple.com/?q=New+York+Cafe+Budapest" target="_blank">🍎 Apple Maps</a>
+  </div>
+  <div class="map-note">💡 點撳上面按鈕，喺手機地圖直接睇今日路線</div>
+  <div class="itinerary">
+    <div class="time-block">
+      <div class="time-label">11:50</div>
+      <div class="spot-card">
+        <div class="spot-name">✈️ 五人 BUD 機場大會合！🎉</div>
+        <div class="spot-desc">🇺🇸 美國組（源、茜、珠）11:50am 抵達 · 🇭🇰 香港組（文、Ice）11:15am 抵達。喺入境大堂出口等齊五個人，一齊去酒店放行李！</div>
+        <div class="spot-tip">💡 建議用 WhatsApp 保持聯絡方便找到對方 · ⚠️ 小心黑的士，用 Bolt App 或官方的士</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">下午</div>
+      <div class="spot-card">
+        <div class="spot-name">中央市場 <span class="spot-name-en">Central Market Hall</span></div>
+        <div class="spot-desc">布達佩斯最大的室內市場，可以購買紀念品、匈牙利辣椒粉、鵝肝醬等特產。建議試試傳統小食。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">下午</div>
+      <div class="spot-card">
+        <div class="spot-name">自由橋 <span class="spot-name-en">Liberty Bridge</span></div>
+        <div class="spot-desc">優雅的新藝術風格橋樑，可在橋上散步欣賞多瑙河景色。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label dinner">晚餐 18:00</div>
+      <div class="spot-card">
+        <div class="spot-name">NEW YORK 咖啡館 <span class="spot-booked">已訂</span></div>
+        <div class="spot-name-en">New York Café</div>
+        <div class="spot-desc">被譽為「全球最美麗的咖啡館之一」，金碧輝煌的新巴洛克式裝潢，配合現場小提琴演奏，極盡奢華。</div>
+        <div class="spot-address">📍 Budapest, Erzsébet krt. 9-11, 1073</div>
+        <div class="spot-tip">💡 記得欣賞四周裝潢，拍照留念！</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">21:00</div>
+      <div class="spot-card">
+        <div class="spot-name">🚢 多瑙河夜遊船 <span class="spot-name-en">Danube Night Cruise</span></div>
+        <div class="spot-desc">夜晚多瑙河景色絕美，國會大廈、鏈橋、漁人堡燈光倒映水面，浪漫醉人。這是布達佩斯最難忘的體驗之一。</div>
+        <div class="spot-tip">💡 帶輕薄外套，船上夜晚可能較涼</div>
+      </div>
+    </div>
+    <div class="hotel-card">
+      <div class="hotel-icon">🛏️</div>
+      <div class="hotel-info">
+        <div class="hotel-label">今晚住宿 · 第1晚</div>
+        <div class="hotel-name">Chloe Hotel Budapest</div>
+        <div class="hotel-addr">📍 1056 Budapest, Só utca 4</div>
+        <div class="hotel-nights">共住2晚（5/8–5/10）</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5/9 BUDAPEST -->
+<div class="day-content" id="d5_9">
+  <div class="day-header">
+    <div class="day-date">5月9日 六</div>
+    <div class="day-title">🇭🇺 布達佩斯精華遊</div>
+    <div class="day-subtitle">城堡山 + 佩斯市中心 全日遊</div>
+  </div>
+  <div class="map-btn-row">
+    <a class="map-btn" href="https://www.google.com/maps/dir/Fisherman%27s+Bastion+Budapest/Matthias+Church+Budapest/Buda+Castle/St+Stephen%27s+Basilica+Budapest/Shoes+on+the+Danube+Bank/Heroes+Square+Budapest/Essencia+Restaurant+Budapest" target="_blank">🗺️ Google Maps 今日路線</a>
+  </div>
+  <div class="map-note">💡 漁人堡 → 馬加什教堂 → 布達城堡 → 聖伊什特萬 → 英雄廣場 → Essencia 晚餐</div>
+  <div class="itinerary">
+    <div class="section-label">🌅 上午 — 布達城堡山</div>
+    <div class="time-block">
+      <div class="time-label">9:00</div>
+      <div class="spot-card">
+        <div class="spot-name">漁人堡 <span class="spot-name-en">Fisherman's Bastion (Halászbástya)</span></div>
+        <div class="spot-desc">白色拱門如童話城堡，是拍攝國會大廈全景的最佳位置。七座塔樓代表匈牙利建國七個部族。</div>
+        <div class="spot-tip">⚠️ 下層免費，上層塔樓需購票（約€5）。建議早去避開人潮！</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">10:00</div>
+      <div class="spot-card">
+        <div class="spot-name">馬加什教堂 <span class="spot-name-en">Matthias Church (Mátyás-templom)</span></div>
+        <div class="spot-desc">彩色磁磚屋頂斑斕亮麗，哥德式建築精緻優美，多位匈牙利國王在此加冕。教堂內亦有管風琴音樂會。</div>
+        <div class="spot-tip">💡 需要購票入內，約€9/人</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">11:00</div>
+      <div class="spot-card">
+        <div class="spot-name">布達城堡 <span class="spot-name-en">Buda Castle</span></div>
+        <div class="spot-desc">漫步宮殿廣場，俯瞰塞切尼鏈橋和多瑙河全景。城堡內有匈牙利國家美術館及歷史博物館。</div>
+      </div>
+    </div>
+    <div class="section-label">🍽️ 午餐</div>
+    <div class="time-block">
+      <div class="time-label lunch">午餐 12:00</div>
+      <div class="spot-card">
+        <div class="spot-name">麥當勞 McDonald's</div>
+        <div class="spot-address">📍 Budapest, Terez krt. 55, 1062</div>
+      </div>
+    </div>
+    <div class="section-label">🌆 下午 — 佩斯市中心</div>
+    <div class="time-block">
+      <div class="time-label">14:00</div>
+      <div class="spot-card">
+        <div class="spot-name">聖伊什特萬聖殿 <span class="spot-name-en">St. Stephen's Basilica</span></div>
+        <div class="spot-desc">布達佩斯最大的教堂，可容納8,500人。登頂可俯瞰全城，收藏著匈牙利守護聖人的右手聖物。</div>
+        <div class="spot-tip">⚠️ 需要購票入內</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">15:00</div>
+      <div class="spot-card">
+        <div class="spot-name">塞切尼鏈橋 <span class="spot-name-en">Széchenyi Chain Bridge</span></div>
+        <div class="spot-desc">匈牙利最著名的橋樑，連接布達與佩斯兩岸。橋頭有石獅守護，夜晚燈光璀璨，是布達佩斯的象徵。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">15:30</div>
+      <div class="spot-card">
+        <div class="spot-name">多瑙河岸鞋子 <span class="spot-name-en">Shoes on the Danube Bank</span></div>
+        <div class="spot-desc">令人動容的歷史紀念碑，悼念二戰時在此被槍殺入河的猶太人。60雙鐵製鞋子整齊排列，肅穆感人。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">16:30</div>
+      <div class="spot-card">
+        <div class="spot-name">英雄廣場 <span class="spot-name-en">Heroes' Square (Hősök tere)</span></div>
+        <div class="spot-desc">雄偉的千禧紀念碑，七位馬扎爾族首領的雕像群，代表匈牙利建國歷史人物。廣場兩側有美術館及藝術館。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label dinner">晚餐 19:00</div>
+      <div class="spot-card">
+        <div class="spot-name">Essencia 現代葡萄牙菜 <span class="spot-booked">已訂</span></div>
+        <div class="spot-name-en">Essência Restaurant - Tiago & Éva</div>
+        <div class="spot-desc">米芝蓮星級餐廳，結合葡萄牙與匈牙利風味的創意菜式，擺盤精緻，服務一流。</div>
+        <div class="spot-address">📍 Budapest, Sas u 17, 1051 &nbsp;|&nbsp; ☎️ +36 70 600 0315</div>
+      </div>
+    </div>
+    <div class="hotel-card">
+      <div class="hotel-icon">🛏️</div>
+      <div class="hotel-info">
+        <div class="hotel-label">今晚住宿 · 第2晚</div>
+        <div class="hotel-name">Chloe Hotel Budapest</div>
+        <div class="hotel-addr">📍 1056 Budapest, Só utca 4</div>
+        <div class="hotel-nights">明天 5/10 退房，前往維也納</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5/10 VIENNA -->
+<div class="day-content" id="d5_10">
+  <div class="day-header">
+    <div class="day-date">5月10日 日</div>
+    <div class="day-title">🇦🇹 布達佩斯 → 維也納 Vienna</div>
+    <div class="day-subtitle">帝國榮耀與經典地標</div>
+  </div>
+  <div class="map-btn-row">
+    <a class="map-btn" href="https://www.google.com/maps/dir/Vienna+State+Opera/Hofburg+Palace+Vienna/Belvedere+Palace+Vienna/Prater+Ferris+Wheel+Vienna/Nihonbashi+Restaurant+Vienna" target="_blank">🗺️ Google Maps 今日路線</a>
+  </div>
+  <div class="map-note">💡 國家歌劇院 → 霍夫堡 → 貝爾維德宮 → 普拉特摩天輪 → Nihonbashi 晚餐</div>
+  <div class="itinerary">
+    <div class="time-block">
+      <div class="time-label">9:00</div>
+      <div class="spot-card">
+        <div class="spot-name">🚗 出發往維也納</div>
+        <div class="spot-desc">由布達佩斯出發，車程約2.5小時，約11:30到達維也納市中心。</div>
+      </div>
+    </div>
+    <div class="section-label">🏛️ 下午 — 環城大道建築群</div>
+    <div class="time-block">
+      <div class="time-label">12:00</div>
+      <div class="spot-card">
+        <div class="spot-name">國家歌劇院 <span class="spot-name-en">Vienna State Opera (Wiener Staatsoper)</span></div>
+        <div class="spot-desc">文藝復興風格宏偉外觀，是世界頂級歌劇院之一。適合廣角拍攝，外觀已非常壯麗。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">13:00</div>
+      <div class="spot-card">
+        <div class="spot-name">霍夫堡皇宮 <span class="spot-name-en">Hofburg Palace</span></div>
+        <div class="spot-desc">奧地利哈布斯堡王朝的冬宮，在英雄廣場（Heldenplatz）可拍攝宏大圓頂與皇家馬車場景。內有茜茜公主博物館。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">13:30</div>
+      <div class="spot-card">
+        <div class="spot-name">國會大廈與市政廳 <span class="spot-name-en">Parliament & Rathaus</span></div>
+        <div class="spot-desc">兩座壯麗建築相鄰，市政廳高聳哥德式尖塔是拍攝重點，國會大廈仿希臘古典風格建築。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">14:30</div>
+      <div class="spot-card">
+        <div class="spot-name">聖史蒂芬大教堂 <span class="spot-name-en">St. Stephen's Cathedral (Stephansdom)</span></div>
+        <div class="spot-desc">維也納老城中心地標，著名的彩色琉璃瓦頂和哥德式尖塔，被認為是維也納最具代表性的建築。</div>
+        <div class="spot-tip">💡 外觀拍攝免費；進入南塔需購票</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">15:30</div>
+      <div class="spot-card">
+        <div class="spot-name">貝爾維德宮 <span class="spot-name-en">Belvedere Palace</span></div>
+        <div class="spot-desc">壯麗的巴洛克式宮殿，可在花園區免費欣賞宮殿全景拍照。館內收藏克林姆名畫《吻》。</div>
+        <div class="spot-tip">💡 花園免費開放，進入博物館才需購票</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">17:00</div>
+      <div class="spot-card">
+        <div class="spot-name">普拉特摩天輪 <span class="spot-name-en">Prater Ferris Wheel (Riesenrad)</span></div>
+        <div class="spot-desc">建於1897年的百年摩天輪，夜幕降臨燈光極美。從高處可俯瞰整個維也納，是維也納的著名標誌。</div>
+        <div class="spot-tip">💡 票價約€14.5/人，可網上預購</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label dinner">晚餐 19:00</div>
+      <div class="spot-card">
+        <div class="spot-name">Restaurant Nihonbashi（日本菜）<span class="spot-booked">已訂 5人</span></div>
+        <div class="spot-desc">維也納著名日本料理，食物新鮮精緻，服務貼心。</div>
+        <div class="spot-address">📍 Kärntner Strasse 44, 1010 Wien &nbsp;|&nbsp; ☎️ +43 1 890 7856</div>
+      </div>
+    </div>
+    <div class="hotel-card">
+      <div class="hotel-icon">🛏️</div>
+      <div class="hotel-info">
+        <div class="hotel-label">今晚住宿 · 第1晚</div>
+        <div class="hotel-name">Austria Trend Hotel Europa Wien</div>
+        <div class="hotel-addr">📍 Kärntnerstraße 18, 1010 Wien &nbsp;|&nbsp; ☎️ +43 (0)1 890 78 56</div>
+        <div class="hotel-nights">共住2晚（5/10–5/12）</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5/11 VIENNA -->
+<div class="day-content" id="d5_11">
+  <div class="day-header">
+    <div class="day-date">5月11日 一</div>
+    <div class="day-title">🇦🇹 維也納 — 藝術奇觀日</div>
+    <div class="day-subtitle">美泉宮 + 百水公寓 + 夜間歌劇</div>
+  </div>
+  <div class="map-btn-row">
+    <a class="map-btn" href="https://www.google.com/maps/dir/Schonbrunn+Palace+Vienna/Hundertwasserhaus+Vienna/Karlskirche+Vienna/Kahlenberg+Vienna/Vienna+State+Opera" target="_blank">🗺️ Google Maps 今日路線</a>
+  </div>
+  <div class="map-note">💡 美泉宮 → 百水公寓 → 卡爾教堂 → 卡倫山 → 維也納歌劇院</div>
+  <div class="itinerary">
+    <div class="time-block">
+      <div class="time-label">9:00</div>
+      <div class="spot-card">
+        <div class="spot-name">美泉宮 <span class="spot-name-en">Schönbrunn Palace (Schloss Schönbrunn)</span></div>
+        <div class="spot-desc">世界文化遺產，哈布斯堡皇室夏宮，擁有1,441個房間。花園免費開放，宮殿內部需購票。可搭小火車上卡蒙旋（Gloriette）俯瞰全維也納。</div>
+        <div class="spot-tip">⚠️ 強烈建議提前網上訂票，65歲以上有優惠票！宮殿內不可拍照，但花園可以。建議預留3-4小時。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">11:30</div>
+      <div class="spot-card">
+        <div class="spot-name">百水公寓 <span class="spot-name-en">Hundertwasserhaus</span></div>
+        <div class="spot-desc">維也納最具代表性的現代藝術建築，色彩鮮艷、線條不規則，猶如童話世界。此處本身不開放居住區參觀，只可在外拍照。對面有精品店可逛。</div>
+        <div class="spot-tip">💡 搭路面電車 O 線可直達</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">13:00</div>
+      <div class="spot-card">
+        <div class="spot-name">卡爾教堂 <span class="spot-name-en">Karlskirche</span></div>
+        <div class="spot-desc">巨大圓頂與兩側高聳石柱，在水池中倒影非常迷人，是攝影愛好者的必拍之點。附近有小餐廳可用午餐。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">14:30</div>
+      <div class="spot-card">
+        <div class="spot-name">卡倫山 <span class="spot-name-en">Kahlenberg</span></div>
+        <div class="spot-desc">請司機送往維也納近郊最高點，俯瞰多瑙河、葡萄園及整個維也納市區景觀，是最棒的全景拍攝地點。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label dinner">18:00</div>
+      <div class="spot-card">
+        <div class="spot-name">🎭 維也納國家歌劇院 <span class="spot-booked">已訂票</span></div>
+        <div class="spot-name-en">Wiener Staatsoper</div>
+        <div class="spot-desc">世界頂級歌劇院的精彩演出，是此次旅程的文化亮點。建議正式著裝，提前到場。</div>
+        <div class="spot-address">📍 Opernring 2, 1010 Wien</div>
+        <div class="spot-tip">💡 演出前可在歌劇院內咖啡廳用餐，氣氛極佳</div>
+      </div>
+    </div>
+    <div class="hotel-card">
+      <div class="hotel-icon">🛏️</div>
+      <div class="hotel-info">
+        <div class="hotel-label">今晚住宿 · 第2晚</div>
+        <div class="hotel-name">Austria Trend Hotel Europa Wien</div>
+        <div class="hotel-addr">📍 Kärntnerstraße 18, 1010 Wien &nbsp;|&nbsp; ☎️ +43 (0)1 890 78 56</div>
+        <div class="hotel-nights">明天 5/12 退房，前往薩爾茨堡</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5/12 SALZBURG -->
+<div class="day-content" id="d5_12">
+  <div class="day-header">
+    <div class="day-date">5月12日 二</div>
+    <div class="day-title">🇦🇹 維也納 → 薩爾茨堡 Salzburg</div>
+    <div class="day-subtitle">莫扎特故鄉 · 音樂之城</div>
+  </div>
+  <div class="map-btn-row">
+    <a class="map-btn" href="https://www.google.com/maps/dir/Mirabell+Palace+Salzburg/Getreidegasse+Salzburg/Hohensalzburg+Fortress/Salzburg+Cathedral" target="_blank">🗺️ Google Maps 今日路線</a>
+  </div>
+  <div class="map-note">💡 米拉貝爾宮 → 格特萊德巷 → 霍亨要塞 → 薩爾茨堡大教堂</div>
+  <div class="itinerary">
+    <div class="time-block">
+      <div class="time-label">8:30</div>
+      <div class="spot-card">
+        <div class="spot-name">🚗 出發往薩爾茨堡</div>
+        <div class="spot-desc">城市行，車程約3小時，沿途奧地利田園風光如畫。約11:30抵達薩爾茨堡開始城市遊覽。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">11:30</div>
+      <div class="spot-card">
+        <div class="spot-name">米拉貝爾宮與花園 <span class="spot-name-en">Schloss Mirabell & Gardens</span></div>
+        <div class="spot-desc">電影《真善美》取景地！花園優美整齊，以霍亨薩爾茨堡要塞為背景的花園景色絕美。花園免費開放。</div>
+        <div class="spot-tip">💡 電影中 "Do-Re-Mi" 場景就在此拍攝！</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label lunch">午餐 13:00</div>
+      <div class="spot-card">
+        <div class="spot-name">老城區午餐 + 散步</div>
+        <div class="spot-desc">在老城區小餐廳享用奧地利傳統午餐，之後漫步格特萊德巷，欣賞掛有各式招牌的購物街。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">13:30</div>
+      <div class="spot-card">
+        <div class="spot-name">格特萊德巷 <span class="spot-name-en">Getreidegasse</span></div>
+        <div class="spot-desc">薩爾茨堡最著名的購物街，各式精緻招牌是一大特色。莫扎特出生地就在此街上。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">13:45</div>
+      <div class="spot-card">
+        <div class="spot-name">莫扎特出生地 <span class="spot-name-en">Mozart's Birthplace</span></div>
+        <div class="spot-desc">世界最偉大音樂家莫扎特的誕生之所，現為博物館，展示其生平與樂器。</div>
+        <div class="spot-tip">💡 入場約€15/人，可選擇外觀拍照</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">14:30</div>
+      <div class="spot-card">
+        <div class="spot-name">霍亨薩爾茨堡要塞 <span class="spot-name-en">Hohensalzburg Fortress</span></div>
+        <div class="spot-desc">中歐保存最完整的要塞之一，搭纜車上山，俯瞰薩爾茨堡全城景觀及遠處阿爾卑斯山脈。</div>
+        <div class="spot-tip">💡 纜車 + 要塞入場票約€16/人，景色非常壯觀！</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">16:30</div>
+      <div class="spot-card">
+        <div class="spot-name">薩爾茨堡大教堂 <span class="spot-name-en">Salzburg Cathedral & St. Peter's Abbey</span></div>
+        <div class="spot-desc">巴洛克式建築精華，教堂外觀宏偉，莫扎特曾在此受洗。聖彼得修道院是歐洲最古老的修道院之一。</div>
+      </div>
+    </div>
+    <div class="hotel-card">
+      <div class="hotel-icon">🛏️</div>
+      <div class="hotel-info">
+        <div class="hotel-label">今晚住宿 · 1晚</div>
+        <div class="hotel-name">Austria Trend Hotel Europa Salzburg</div>
+        <div class="hotel-addr">📍 Rainerstraße 31, 5020 Salzburg</div>
+        <div class="hotel-nights">明天 5/13 退房，前往哈修塔特</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5/13 HALLSTATT + LINZ -->
+<div class="day-content" id="d5_13">
+  <div class="day-header">
+    <div class="day-date">5月13日 三</div>
+    <div class="day-title">🇦🇹 薩爾茨堡 → 哈修塔特 → 林茨</div>
+    <div class="day-subtitle">明信片小鎮 · 世界文化遺產湖景</div>
+  </div>
+  <div class="map-btn-row">
+    <a class="map-btn" href="https://www.google.com/maps/dir/Salzburg+Austria/Hallstatt+Austria/St+Gilgen+Austria/Linz+Austria" target="_blank">🗺️ Google Maps 今日路線</a>
+  </div>
+  <div class="map-note">💡 薩爾茨堡 → 哈修塔特 → 聖吉爾根 → 林茨</div>
+  <div class="itinerary">
+    <div class="time-block">
+      <div class="time-label">9:30</div>
+      <div class="spot-card">
+        <div class="spot-name">🚗 出發往哈修塔特 Hallstatt</div>
+        <div class="spot-desc">車程約1小時20分。建議包車直抵Lahn站（南端），減少步行負擔。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">10:30</div>
+      <div class="spot-card">
+        <div class="spot-name">明信片觀景點 <span class="spot-name-en">Classic Postcard View</span></div>
+        <div class="spot-desc">哈修塔特最著名的拍攝角度，位於小鎮北端。湖景與教堂的倒影，如詩如畫，這個角度是全世界最多人拍攝的風景之一。</div>
+        <div class="spot-tip">⚠️ 5月已是旺季，人多！建議早上10點前到達，避開人潮</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">11:00</div>
+      <div class="spot-card">
+        <div class="spot-name">Skywalk 觀景台 <span class="spot-name-en">Hallstatt Skywalk</span></div>
+        <div class="spot-desc">搭纜車上山，高臨千人，可360度俯瞰哈修塔特湖。景色震撼，是一生人必看的壯觀景緻。</div>
+        <div class="spot-tip">💡 纜車來回約€15/人。觀景台地面是玻璃，注意穿著合適鞋子</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label lunch">午餐 12:30</div>
+      <div class="spot-card">
+        <div class="spot-name">市集廣場小食 <span class="spot-name-en">Market Square</span></div>
+        <div class="spot-desc">在市集廣場附近的小餐廳用餐，欣賞古老建築。⚠️ 哈修塔特物價較高，心理準備。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">14:00</div>
+      <div class="spot-card">
+        <div class="spot-name">中途停靠：聖吉爾根 <span class="spot-name-en">St. Gilgen / St. Wolfgang</span></div>
+        <div class="spot-desc">沿途湖區小鎮，寧靜優美，適合長輩悠閒散步拍照，欣賞奧地利湖區田園風光。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">17:00</div>
+      <div class="spot-card">
+        <div class="spot-name">🏙️ 抵達林茨 Linz</div>
+        <div class="spot-desc">奧地利第三大城市，有「藝術之城」之稱。入住酒店後可到附近參觀。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">17:30</div>
+      <div class="spot-card">
+        <div class="spot-name">林茨新主教堂 <span class="spot-name-en">Linz New Cathedral</span></div>
+        <div class="spot-desc">奧地利最大的哥德式教堂，彩色玻璃窗精美，描述林茨歷史。免費開放 8:00-19:00。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label dinner">晚餐 19:00</div>
+      <div class="spot-card">
+        <div class="spot-name">MIYAKO RAMEN（日本拉麵）</div>
+        <div class="spot-desc">林茨評分極高的日本拉麵店，湯底濃郁鮮美，份量充足，價格合理。</div>
+        <div class="spot-address">📍 Altstadt 28, 4020 Linz &nbsp;|&nbsp; ☎️ +43 732 918155</div>
+        <div class="spot-tip">💡 建議提前電話訂位</div>
+      </div>
+    </div>
+    <div class="hotel-card">
+      <div class="hotel-icon">🛏️</div>
+      <div class="hotel-info">
+        <div class="hotel-label">今晚住宿 · 1晚（包早餐）</div>
+        <div class="hotel-name">Courtyard by Marriott Linz</div>
+        <div class="hotel-addr">📍 Europaplatz 2, Franckenviertel, 4020 Linz &nbsp;|&nbsp; ☎️ +43 732 695 914</div>
+        <div class="hotel-nights">明天 5/14 退房，前往 CK 小鎮</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5/14 CESKY KRUMLOV -->
+<div class="day-content" id="d5_14">
+  <div class="day-header">
+    <div class="day-date">5月14日 四</div>
+    <div class="day-title">🇨🇿 林茨 → CK小鎮（庫倫洛夫）</div>
+    <div class="day-subtitle">Český Krumlov — 世界遺產中世紀小鎮</div>
+  </div>
+  <div class="map-btn-row">
+    <a class="map-btn" href="https://www.google.com/maps/dir/Cesky+Krumlov+Castle/Cloak+Bridge+Cesky+Krumlov/Svornosti+Square+Cesky+Krumlov/Krcma+Satlava+Cesky+Krumlov" target="_blank">🗺️ Google Maps 今日路線</a>
+  </div>
+  <div class="map-note">💡 城堡 → 斗篷橋 → 舊城廣場 → 地窖餐廳</div>
+  <div class="itinerary">
+    <div class="time-block">
+      <div class="time-label">8:30</div>
+      <div class="spot-card">
+        <div class="spot-name">🚗 出發往CK小鎮</div>
+        <div class="spot-desc">車程約半小時，9:30抵達庫倫洛夫。這個小鎮是聯合國教科文組織世界遺產，保存完好的中世紀建築令人嘆為觀止。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">9:30</div>
+      <div class="spot-card">
+        <div class="spot-name">庫倫洛夫城堡 <span class="spot-name-en">Český Krumlov Castle</span></div>
+        <div class="spot-desc">城堡大門附近，著名的「護城熊」就在壕溝中！城堡區規模龐大，融合哥德式、文藝復興及巴洛克建築，俯瞰伏爾塔瓦河蜿蜒景色。</div>
+        <div class="spot-tip">⚠️ 注意！城堡逢星期一關閉，你哋係星期四去，OK！</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">10:00</div>
+      <div class="spot-card">
+        <div class="spot-name">斗篷橋與景觀平台 <span class="spot-name-en">Cloak Bridge / Viewpoint</span></div>
+        <div class="spot-desc">拍照重點！請司機到後方花園入口方向停車。橋上可俯瞰整個小鎮的橘色屋頂，景色如畫。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">11:00</div>
+      <div class="spot-card">
+        <div class="spot-name">舊城廣場 <span class="spot-name-en">Svornosti Square</span></div>
+        <div class="spot-desc">黑死病紀念柱與市政廳所在，典型的歐洲中世紀廣場氣圍。石板路、彩色外牆建築，充滿歷史感。</div>
+        <div class="spot-tip">💡 廣場石板路崎嶇，建議穿防滑鞋</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label lunch">午餐 12:30</div>
+      <div class="spot-card">
+        <div class="spot-name">My Sagon 亞洲餐廳（無訂）</div>
+        <div class="spot-desc">小鎮內的亞洲菜選擇，口味較熟悉，適合長輩。如已滿座可到附近其他餐廳。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">14:00</div>
+      <div class="spot-card">
+        <div class="spot-name">城堡區繼續遊覽</div>
+        <div class="spot-desc">CK小鎮多為石板路，環境幽靜，下午人潮較少，更能感受中世紀氣圍。可漫步理髮師橋（Lazebnický most）附近。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label dinner">晚餐 18:00</div>
+      <div class="spot-card">
+        <div class="spot-name">地窖餐廳 Krčma Šatlava <span class="spot-booked">已訂</span></div>
+        <div class="spot-desc">CK小鎮最著名的餐廳之一，就在理髮師橋附近。燒烤美食全都出自餐廳中央那個大大的炭火烤爐，香氣四溢，非常有特色。</div>
+        <div class="spot-address">📍 Náměstí Svornosti 3, 38101, Czech Rep. &nbsp;|&nbsp; ☎️ +420 380 711 671</div>
+      </div>
+    </div>
+    <div class="hotel-card">
+      <div class="hotel-icon">🛏️</div>
+      <div class="hotel-info">
+        <div class="hotel-label">今晚住宿 · 1晚（包早餐）</div>
+        <div class="hotel-name">格蘭酒店 Grand Hotel</div>
+        <div class="hotel-addr">📍 Náměstí Svornosti 3, 38101 Český Krumlov</div>
+        <div class="hotel-nights">明天 5/15 退房，前往布拉格</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5/15 PRAGUE -->
+<div class="day-content" id="d5_15">
+  <div class="day-header">
+    <div class="day-date">5月15日 五</div>
+    <div class="day-title">🇨🇿 CK小鎮 → 布拉格 Prague</div>
+    <div class="day-subtitle">千塔之城 · 城堡區精華遊</div>
+  </div>
+  <div class="map-btn-row">
+    <a class="map-btn" href="https://www.google.com/maps/dir/Prague+Castle/Lennon+Wall+Prague/Charles+Bridge+Prague/Old+Town+Square+Prague/Cafe+Imperial+Prague" target="_blank">🗺️ Google Maps 今日路線</a>
+  </div>
+  <div class="map-note">💡 城堡區（高）→ 連儂牆 → 查理大橋 → 舊城廣場 → Café Imperial 晚餐</div>
+  <div class="itinerary">
+    <div class="time-block">
+      <div class="time-label">9:00</div>
+      <div class="spot-card">
+        <div class="spot-name">🚗 出發往布拉格</div>
+        <div class="spot-desc">車程約2.5小時，預計11:30抵達。建議司機先往皇家花園（Královská zahrada）附近讓拍攝者下車，由高至低行走，體力消耗最少。</div>
+      </div>
+    </div>
+    <div class="section-label">🏰 下午 — 城堡區拍攝路線（由高至低）</div>
+    <div class="time-block">
+      <div class="time-label">11:30</div>
+      <div class="spot-card">
+        <div class="spot-name">布拉格城堡區 <span class="spot-name-en">Prague Castle District</span></div>
+        <div class="spot-desc">聖維特大教堂宏偉的哥德式外觀令人嘆為觀止。從城堡出口的觀景台，可俯拍布拉格「千塔之城」的橙紅色屋頂全景。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">12:30</div>
+      <div class="spot-card">
+        <div class="spot-name">小城區 <span class="spot-name-en">Lesser Town (Malá Strana)</span></div>
+        <div class="spot-desc">沿Nerudova街下行，兩旁滿是巴洛克建築與石板路，是布拉格最具歷史感的街道之一。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">13:00</div>
+      <div class="spot-card">
+        <div class="spot-name">連儂牆 <span class="spot-name-en">Lennon Wall</span></div>
+        <div class="spot-desc">步行去查理大橋途中的隱秘景點。牆上滿是和平與自由的塗鴉與詩句，每次都不一樣。1980年代曾是反共產主義的「靜默抗議」場所。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">13:30</div>
+      <div class="spot-card">
+        <div class="spot-name">查理大橋 <span class="spot-name-en">Charles Bridge (Karlův most)</span></div>
+        <div class="spot-desc">布拉格最著名的橋樑，兩側30座聖人雕像守護。從橋頭俯瞰橋與伏爾塔瓦河，景色如詩如畫。</div>
+        <div class="spot-tip">💡 注意石板路比較滑，慢慢行走</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">14:30</div>
+      <div class="spot-card">
+        <div class="spot-name">舊城廣場 <span class="spot-name-en">Old Town Square</span></div>
+        <div class="spot-desc">天文鐘整點有機械人偶表演，提恩教堂的黑色雙塔非常著名，廣場四周的建築色彩繽紛，是布拉格最熱鬧的廣場。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label dinner">晚餐 19:00</div>
+      <div class="spot-card">
+        <div class="spot-name">Café Imperial（捷克傳統菜）<span class="spot-booked">已訂</span></div>
+        <div class="spot-desc">百年歷史的宏偉咖啡館，新藝術風格馬賽克裝潢令人嘆為觀止。食物精緻，服務一流，是布拉格最值得一去的餐廳之一。</div>
+        <div class="spot-address">📍 Na Poříčí 1072/15, 110 00 Praha &nbsp;|&nbsp; ☎️ +420 246 011 440</div>
+      </div>
+    </div>
+    <div class="hotel-card">
+      <div class="hotel-icon">🛏️</div>
+      <div class="hotel-info">
+        <div class="hotel-label">今晚起住宿 · 第1晚（包早餐）</div>
+        <div class="hotel-name">Hotel Rott Prague</div>
+        <div class="hotel-addr">📍 布拉格舊城區（Malé náměstí 4, 110 00 Praha）</div>
+        <div class="hotel-nights">共住3晚（5/15–5/18），5/18 早上退房</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5/16 PRAGUE -->
+<div class="day-content" id="d5_16">
+  <div class="day-header">
+    <div class="day-date">5月16日 六</div>
+    <div class="day-title">🇨🇿 布拉格 — 舊城與新城</div>
+    <div class="day-subtitle">天文鐘 · 市集 · 購物 · 河畔晚餐</div>
+  </div>
+  <div class="map-btn-row">
+    <a class="map-btn" href="https://www.google.com/maps/dir/Prague+Astronomical+Clock/Havel%27s+Market+Prague/Parizska+Street+Prague/Wenceslaus+Square+Prague/Marina+Ristorante+Prague" target="_blank">🗺️ Google Maps 今日路線</a>
+  </div>
+  <div class="map-note">💡 天文鐘 → 哈維爾市集 → 巴黎大街 → 瓦茨拉夫廣場 → Marina 河畔晚餐</div>
+  <div class="itinerary">
+    <div class="section-label">🌅 上午 — 舊城廣場</div>
+    <div class="time-block">
+      <div class="time-label">9:00</div>
+      <div class="spot-card">
+        <div class="spot-name">天文鐘 <span class="spot-name-en">Prague Astronomical Clock</span></div>
+        <div class="spot-desc">每整點都有機械人偶表演，看鐘面上太陽月亮的運行，是600年前的精密工程。建議整點前幾分鐘到達等候。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">10:00</div>
+      <div class="spot-card">
+        <div class="spot-name">哈維爾市集 <span class="spot-name-en">Havel's Market</span></div>
+        <div class="spot-desc">800年歷史的古老市集，可買到木偶（布拉格著名紀念品）、磁鐵、手工藝品等特色伴手禮。</div>
+        <div class="spot-tip">💡 購物可以議價，帶現金比較方便</div>
+      </div>
+    </div>
+    <div class="section-label">🛍️ 下午 — 購物</div>
+    <div class="time-block">
+      <div class="time-label">14:00</div>
+      <div class="spot-card">
+        <div class="spot-name">巴黎大街 <span class="spot-name-en">Pařížská Street</span></div>
+        <div class="spot-desc">布拉格唯一的頂級精品街，LV、Gucci、Hermès等名牌雲集，建築亦非常優美，值得一逛。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">15:00</div>
+      <div class="spot-card">
+        <div class="spot-name">瓦茨拉夫廣場 <span class="spot-name-en">Wenceslaus Square</span></div>
+        <div class="spot-desc">新城區最大的購物廣場，大型服飾連鎖店與百貨林立，是布拉格最熱鬧的購物區。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">17:30</div>
+      <div class="spot-card">
+        <div class="spot-name">查理大橋夜景散步</div>
+        <div class="spot-desc">傍晚穿梭橋上雕像群中，欣賞伏爾塔瓦河夜景，布拉格城堡在燈光映照下格外浪漫迷人。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label dinner">晚餐 19:00</div>
+      <div class="spot-card">
+        <div class="spot-name">Marina Ristorante（河畔意式晚餐）<span class="spot-booked">已訂</span></div>
+        <div class="spot-desc">停泊於伏爾塔瓦河上的浮動餐廳，可同時欣賞查理大橋與布拉格城堡的夜景。氣氛極佳，食物精緻。</div>
+        <div class="spot-address">📍 Alšovo nábřeží 10, 110 00 Praha 1 &nbsp;|&nbsp; ☎️ +420 605 454 020</div>
+        <div class="spot-tip">💡 牛扒按重量計費，留意菜單說明</div>
+      </div>
+    </div>
+    <div class="hotel-card">
+      <div class="hotel-icon">🛏️</div>
+      <div class="hotel-info">
+        <div class="hotel-label">今晚住宿 · 第2晚</div>
+        <div class="hotel-name">Hotel Rott Prague</div>
+        <div class="hotel-addr">📍 布拉格舊城區</div>
+        <div class="hotel-nights">共住3晚（5/15–5/18）</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5/17 PRAGUE -->
+<div class="day-content" id="d5_17">
+  <div class="day-header">
+    <div class="day-date">5月17日 日</div>
+    <div class="day-title">🇨🇿 布拉格 — 自由行</div>
+    <div class="day-subtitle">隨心遊覽 · 最後一夜河畔晚餐</div>
+  </div>
+  <div class="map-btn-row">
+    <a class="map-btn" href="https://www.google.com/maps/dir/Old+Town+Square+Prague/Charles+Bridge+Prague/Four+Seasons+Hotel+Prague" target="_blank">🗺️ Google Maps 今日路線</a>
+  </div>
+  <div class="map-note">💡 舊城廣場 → 查理大橋黃昏漫步 → Four Seasons 最後晚餐</div>
+  <div class="itinerary">
+    <div class="time-block">
+      <div class="time-label">上午</div>
+      <div class="spot-card">
+        <div class="spot-name">自由活動</div>
+        <div class="spot-desc">可重遊喜歡的景點，或選擇休息。舊城廣場一帶有許多咖啡館，適合悠閒坐坐，欣賞廣場景致。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">下午</div>
+      <div class="spot-card">
+        <div class="spot-name">最後購物 / 舊城廣場再訪</div>
+        <div class="spot-desc">瓦茨拉夫廣場購物，或在舊城廣場附近的咖啡館休息喝咖啡。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label">17:30</div>
+      <div class="spot-card">
+        <div class="spot-name">查理大橋黃昏漫步</div>
+        <div class="spot-desc">日落時分的查理大橋最為浪漫，金色光芒灑在石頭橋面上，橋上街頭藝人演奏，氣氛一流。</div>
+      </div>
+    </div>
+    <div class="time-block">
+      <div class="time-label dinner">晚餐 19:15</div>
+      <div class="spot-card">
+        <div class="spot-name">Four Seasons（意大利菜）<span class="spot-booked">已訂</span></div>
+        <div class="spot-desc">布拉格四季酒店餐廳，可俯瞰伏爾塔瓦河，是整個旅程完美的最後晚餐。</div>
+        <div class="spot-address">📍 Veleslavínova 2a, 110 00 Praha 1</div>
+      </div>
+    </div>
+    <div class="tips-card">
+      <div class="tips-title">📦 明天回程，今晚準備</div>
+      <ul class="tips-list">
+        <li>收拾行李，把購買的紀念品妥善包裝</li>
+        <li>確認護照、機票、酒店退房時間</li>
+        <li>預早叫好明早的士往機場（建議7:30前出發）</li>
+        <li>把剩餘捷克克朗換回美元或留作紀念</li>
+      </ul>
+    </div>
+    <div class="hotel-card">
+      <div class="hotel-icon">🛏️</div>
+      <div class="hotel-info">
+        <div class="hotel-label">今晚住宿 · 第3晚（最後一晚）</div>
+        <div class="hotel-name">Hotel Rott Prague</div>
+        <div class="hotel-addr">📍 布拉格舊城區</div>
+        <div class="hotel-nights">明天 5/18 早上退房，前往機場，回家！✈️</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TIPS -->
+<div class="day-content" id="tips">
+  <div class="day-header">
+    <div class="day-date">旅遊貼士</div>
+    <div class="day-title">💡 長輩同行實用建議</div>
+    <div class="day-subtitle">特別為65歲以上旅客準備</div>
+  </div>
+  <div class="tips-section">
+    <div class="tip-block">
+      <div class="tip-emoji">👟</div>
+      <div class="tip-content">
+        <div class="tip-title">穿舒適防滑鞋</div>
+        <div class="tip-body">布達佩斯城堡山、CK小鎮、布拉格城堡區都係石板路，非常容易滑倒。建議穿有防滑底的運動鞋或行山鞋，切忌穿皮鞋或高跟鞋。</div>
+      </div>
+    </div>
+    <div class="tip-block">
+      <div class="tip-emoji">☂️</div>
+      <div class="tip-content">
+        <div class="tip-title">帶摺疊雨傘</div>
+        <div class="tip-body">5月歐洲天氣多變，時有陣雨。輕便摺疊傘必備，亦可作遮陽用途。</div>
+      </div>
+    </div>
+    <div class="tip-block">
+      <div class="tip-emoji">🎟️</div>
+      <div class="tip-content">
+        <div class="tip-title">提前網上訂票</div>
+        <div class="tip-body">美泉宮、漁人堡上層塔樓、霍亨薩爾茨堡要塞建議提前網上購票，避免排長龍。65歲以上大多有優惠票，記得帶護照核實年齡。</div>
+      </div>
+    </div>
+    <div class="tip-block">
+      <div class="tip-emoji">💶</div>
+      <div class="tip-content">
+        <div class="tip-title">現金與信用卡並備</div>
+        <div class="tip-body">匈牙利用福林（HUF），奧地利用歐元（EUR），捷克用克朗（CZK）。CK小鎮部分小店只收現金。信用卡大城市廣泛接受，但建議每人帶約€200現金備用。</div>
+      </div>
+    </div>
+    <div class="tip-block">
+      <div class="tip-emoji">💊</div>
+      <div class="tip-content">
+        <div class="tip-title">帶備常用藥物</div>
+        <div class="tip-body">腸胃藥、止痛藥、感冒藥、血壓藥等，歐洲藥房較貴且語言可能不通。建議帶足整個旅程用量，並多帶幾天份量以防萬一。</div>
+      </div>
+    </div>
+    <div class="tip-block">
+      <div class="tip-emoji">🛡️</div>
+      <div class="tip-content">
+        <div class="tip-title">旅遊保險</div>
+        <div class="tip-body">65歲以上出行，旅遊保險非常重要。建議購買包含醫療緊急援助及緊急送返原居地的保險計劃。出發前確認保單已生效。</div>
+      </div>
+    </div>
+    <div class="tip-block">
+      <div class="tip-emoji">📱</div>
+      <div class="tip-content">
+        <div class="tip-title">國際漫遊 / SIM卡</div>
+        <div class="tip-body">建議購買歐洲旅遊SIM卡（如Airalo），涵蓋匈牙利、奧地利、捷克。方便使用Google Maps導航及緊急聯絡。</div>
+      </div>
+    </div>
+    <div class="tip-block">
+      <div class="tip-emoji">🚕</div>
+      <div class="tip-content">
+        <div class="tip-title">的士App</div>
+        <div class="tip-body">布達佩斯建議用 Bolt App（比黑的士安全）；維也納、薩爾茨堡可用 Uber 或 mytaxi；布拉格可用 Bolt 或 Liftago。避免路邊截的士。</div>
+      </div>
+    </div>
+    <div class="tip-block">
+      <div class="tip-emoji">🥢</div>
+      <div class="tip-content">
+        <div class="tip-title">亞洲食物安排</div>
+        <div class="tip-body">行程中已安排多頓日本菜、拉麵、亞洲菜，讓大家在歐洲旅遊時都可以吃到熟悉口味。如腸胃不適，可找中式或日式餐廳。</div>
+      </div>
+    </div>
+    <div class="tip-block">
+      <div class="tip-emoji">🏦</div>
+      <div class="tip-content">
+        <div class="tip-title">提款機選擇</div>
+        <div class="tip-body">建議使用銀行ATM而非機場或街邊的私人ATM，手續費較低。提款時選擇以當地貨幣計算（不要選擇USD），匯率較好。</div>
+      </div>
+    </div>
+    <div class="tip-block">
+      <div class="tip-emoji">🆘</div>
+      <div class="tip-content">
+        <div class="tip-title">緊急聯絡號碼</div>
+        <div class="tip-body">歐洲統一緊急電話：112（警察、救護、消防）。美國大使館布達佩斯：+36 1 475 4400；維也納：+43 1 313 39 0；布拉格：+420 257 022 000。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  匈奧捷之旅 2026 &nbsp;|&nbsp; 🇺🇸 美國3人 + 🇭🇰 香港2人 &nbsp;|&nbsp; 一生難忘的旅程 🌟
+</footer>
+
+<script>
+function showDay(id) {
+  document.querySelectorAll('.day-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const tabs = document.querySelectorAll('.tab');
+  const ids = ['overview','d5_8','d5_9','d5_10','d5_11','d5_12','d5_13','d5_14','d5_15','d5_16','d5_17','tips'];
+  const idx = ids.indexOf(id);
+  if (idx >= 0) tabs[idx].classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// Weather
+const cities = [
+  { name: '布達佩斯', lat: 47.498, lon: 19.040, flag: '🇭🇺' },
+  { name: '維也納', lat: 48.208, lon: 16.373, flag: '🇦🇹' },
+  { name: '薩爾茨堡', lat: 47.811, lon: 13.033, flag: '🇦🇹' },
+  { name: '布拉格', lat: 50.075, lon: 14.438, flag: '🇨🇿' },
+];
+
+async function loadWeather() {
+  const strip = document.getElementById('weather-strip');
+  try {
+    const results = await Promise.all(cities.map(c =>
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lon}&current=temperature_2m,weather_code&timezone=auto`)
+        .then(r => r.json())
+    ));
+    const wDesc = {0:'晴天',1:'基本晴',2:'多雲',3:'陰天',45:'霧',48:'霧',51:'毛毛雨',53:'毛毛雨',55:'毛毛雨',61:'小雨',63:'中雨',65:'大雨',71:'小雪',73:'中雪',75:'大雪',80:'陣雨',81:'陣雨',82:'大陣雨',95:'雷暴',96:'雷暴',99:'大雷暴'};
+    const wEmoji = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'🌨️',73:'🌨️',75:'❄️',80:'🌦️',81:'🌦️',82:'⛈️',95:'⛈️',96:'⛈️',99:'⛈️'};
+    strip.innerHTML = results.map((r, i) => {
+      const temp = Math.round(r.current.temperature_2m);
+      const code = r.current.weather_code;
+      return `<div class="weather-item">${cities[i].flag} <strong>${cities[i].name}</strong> ${wEmoji[code]||'🌡️'} <span class="weather-temp">${temp}°C</span> <span style="color:var(--text-muted);font-size:0.82rem;">${wDesc[code]||''}</span></div>`;
+    }).join('');
+  } catch(e) {
+    strip.innerHTML = '<div class="weather-loading">天氣資料暫時未能載入</div>';
+  }
+}
+loadWeather();
+</script>
+</body>
+</html>
